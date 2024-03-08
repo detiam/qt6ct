@@ -41,6 +41,7 @@ public:
 
     virtual ~Qt6CTProxyStyle();
 
+    int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
     int styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const override;
 
 private:

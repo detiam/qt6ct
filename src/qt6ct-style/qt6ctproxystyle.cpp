@@ -26,8 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <QApplication>
 #include <QSettings>
 #include <QStyleFactory>
+#include <QWidget>
 #include "qt6ctproxystyle.h"
 
 Qt6CTProxyStyle::Qt6CTProxyStyle()
@@ -57,6 +59,39 @@ void Qt6CTProxyStyle::reloadSettings()
 Qt6CTProxyStyle::~Qt6CTProxyStyle()
 {
     Qt6CT::unregisterStyleInstance(this);
+}
+
+static int adjustIconSize(int size)
+{
+    return (size < 14) ? size :
+           (size < 19) ? 16 :
+           (size < 27) ? 22 :
+           (size < 40) ? 32 :
+           (size < 56) ? 48 : size;
+}
+
+int Qt6CTProxyStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
+{
+    int size = QProxyStyle::pixelMetric(metric, option, widget);
+    qreal scale = widget ? widget->devicePixelRatioF() : qApp->devicePixelRatio();
+
+    // at 1x or 2x, adjust icon sizes to match common raster sizes
+    if (scale != 1.0 && scale != 2.0)
+        return size;
+
+    switch (metric) {
+    case PM_ToolBarIconSize:
+    case PM_SmallIconSize:
+    case PM_LargeIconSize:
+    case PM_IconViewIconSize:
+    case PM_ListViewIconSize:
+    case PM_TabBarIconSize:
+    case PM_MessageBoxIconSize:
+    case PM_ButtonIconSize:
+        return adjustIconSize(size * (int)scale) / (int)scale;
+    default:
+        return size;
+    }
 }
 
 int Qt6CTProxyStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
