@@ -94,6 +94,13 @@ int Qt6CTProxyStyle::pixelMetric(PixelMetric metric, const QStyleOption *option,
     }
 }
 
+QIcon Qt6CTProxyStyle::standardIcon(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const
+{
+    if (standardIcon == QStyle::SP_TabCloseButton)
+        return QIcon::fromTheme("window-close");
+    return QProxyStyle::standardIcon(standardIcon, option, widget);
+}
+
 int Qt6CTProxyStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
 {
     if(hint == QStyle::SH_DialogButtonBox_ButtonsHaveIcons)
