@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QSettings>
 #include <QStyleFactory>
+#include <QStyleOption>
 #include <QWidget>
 #include "qt6ctproxystyle.h"
 
@@ -59,6 +60,27 @@ void Qt6CTProxyStyle::reloadSettings()
 Qt6CTProxyStyle::~Qt6CTProxyStyle()
 {
     Qt6CT::unregisterStyleInstance(this);
+}
+
+void Qt6CTProxyStyle::drawPrimitive(PrimitiveElement elem, const QStyleOption * option,
+                                    QPainter * painter, const QWidget * widget) const
+{
+    if (elem == PE_PanelButtonCommand && m_style == "fusion" &&
+        ((option->state & (State_Sunken | State_On))))
+    {
+        // QFusionStyle draws pressed buttons with very low contrast.
+        // As a workaround, darken them via palette adjustment.
+        QStyleOption option_copy = *option;
+        QColor button = option_copy.palette.color(QPalette::Button);
+        int value = qMax(button.value(), 16);
+        int percent = 100 * (value - 16) / value;
+        option_copy.palette.setColor(QPalette::Button, button.lighter(percent));
+        QProxyStyle::drawPrimitive(elem, &option_copy, painter, widget);
+    }
+    else
+    {
+        QProxyStyle::drawPrimitive(elem, option, painter, widget);
+    }
 }
 
 static int adjustIconSize(int size)
