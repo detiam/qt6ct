@@ -56,7 +56,9 @@ Q_LOGGING_CATEGORY(lqt6ct, "qt6ct", QtWarningMsg)
 
 //QT_QPA_PLATFORMTHEME=qt6ct
 
-Qt6CTPlatformTheme::Qt6CTPlatformTheme()
+Qt6CTPlatformTheme::Qt6CTPlatformTheme() :
+    m_generalFont(*QGenericUnixTheme::font(QPlatformTheme::SystemFont)),
+    m_fixedFont(*QGenericUnixTheme::font(QPlatformTheme::FixedFont))
 {
     Qt6CT::initConfig();
     if(QGuiApplication::desktopSettingsAware())
@@ -279,10 +281,10 @@ void Qt6CTPlatformTheme::readSettings()
     settings.endGroup();
 
     settings.beginGroup("Fonts");
-    m_generalFont = QGuiApplication::font();
-    m_generalFont.fromString(settings.value("general", QGuiApplication::font()).toString());
-    m_fixedFont = QGuiApplication::font();
-    m_fixedFont.fromString(settings.value("fixed", QGuiApplication::font()).toString());
+    m_generalFont = *QGenericUnixTheme::font(QPlatformTheme::SystemFont);
+    m_generalFont.fromString(settings.value("general").toString());
+    m_fixedFont = *QGenericUnixTheme::font(QPlatformTheme::FixedFont);
+    m_fixedFont.fromString(settings.value("fixed").toString());
     settings.endGroup();
 
     settings.beginGroup("Interface");
